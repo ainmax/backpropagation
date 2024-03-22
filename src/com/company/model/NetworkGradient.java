@@ -38,12 +38,12 @@ abstract class NetworkGradient {
            Gij[u][v] - partial derivative of A(i)[u] by W(j)[v]
      */
 
-    NetworkGradient(NeuralNetwork network, double[] inputValues, TestsBase.Test test) {
+    public NetworkGradient(NeuralNetwork network, TestsBase.Test test) {
         this.network = network;
         layersGradients = new Matrix[network.hiddenLayersCount + 1];
 
-        calcFirstHiddenLayerGradient(inputValues);
-        errorFunctionGradient = calcErrorFunctionGradient(inputValues, test);
+        calcFirstHiddenLayerGradient(test.input());
+        errorFunctionGradient = calcErrorFunctionGradient(test);
     }
 
     // Sigmoid function first derivative
@@ -111,8 +111,8 @@ abstract class NetworkGradient {
         calcNextLayerGradient(currentLayerIndex + 1, previousLayerOutput, nextLayerInput);
     }
 
-    private double[] calcErrorFunctionGradient(double[] inputValues, TestsBase.Test test) {
-        double[] networkOutput = network.calcOutputBy(inputValues);
+    private double[] calcErrorFunctionGradient(TestsBase.Test test) {
+        double[] networkOutput = network.calcOutputBy(test.input());
         Matrix errorFunctionGradientMatrix = new Matrix(layersGradients[layersGradients.length - 1]);
 
         // Every partial derivative is multiplied by respective error function derivative

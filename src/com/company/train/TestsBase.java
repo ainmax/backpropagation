@@ -6,7 +6,7 @@ public class TestsBase {
     private final int inputSize;
     private final Function<double[], double[]> answerFunction;
     private Test[] tests;
-    final int size;
+    public final int size;
 
     private int currentTestIndex = -1;
 
@@ -38,7 +38,7 @@ public class TestsBase {
         }
     }
 
-    Test nextTest() {
+    public Test nextTest() {
         if (!hasNextTest()) {
             throw new RuntimeException("There is no next test.");
         }
@@ -46,12 +46,16 @@ public class TestsBase {
         return tests[++currentTestIndex];
     }
 
-    void clearTestsQueue() {
+    public void clearTestsQueue() {
         currentTestIndex = -1;
     }
 
-    boolean hasNextTest() {
+    public boolean hasNextTest() {
         return currentTestIndex + 1 < size;
+    }
+
+    public int getCurrentTestIndex() {
+        return currentTestIndex;
     }
 
     public record Test(double[] input, double[] correctOutput) {}

@@ -3,8 +3,8 @@ package com.company.model;
 import com.company.train.TestsBase;
 
 public class BiasesGradient extends NetworkGradient {
-    BiasesGradient(NeuralNetwork network, double[] inputValues, TestsBase.Test test) {
-        super(network, inputValues, test);
+    public BiasesGradient(NeuralNetwork network, TestsBase.Test test) {
+        super(network, test);
     }
 
     double calcLinearFirstDerivative(double lineCoefficient) {

@@ -3,8 +3,8 @@ package com.company.model;
 import com.company.train.TestsBase;
 
 public class WeightsGradient extends NetworkGradient {
-    WeightsGradient(NeuralNetwork network, double[] inputValues, TestsBase.Test test) {
-        super(network, inputValues, test);
+    public WeightsGradient(NeuralNetwork network, TestsBase.Test test) {
+        super(network, test);
     }
 
     double calcLinearFirstDerivative(double lineCoefficient) {

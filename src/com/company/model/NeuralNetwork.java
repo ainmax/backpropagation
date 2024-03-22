@@ -13,8 +13,8 @@ public class NeuralNetwork {
     Layer[] hiddenLayers;
 
     // Current parameters values
-    Matrix[] weights;
-    Matrix[] biases;
+    public Matrix[] weights;
+    public Matrix[] biases;
 
     // Throws exception if hiddenLayers is empty
     public NeuralNetwork(int inputSize, int outputSize, int[] hiddenLayersSizes) {
@@ -30,6 +30,25 @@ public class NeuralNetwork {
 
         defineBlankStructureByCurrentOptions();
         fillParametersWithRandomValues();
+    }
+
+    // Creates network by another network's options and parameters
+    public NeuralNetwork(NeuralNetwork network) {
+        inputSize = network.inputSize;
+        outputSize = network.outputSize;
+        hiddenLayersCount = network.hiddenLayersCount;
+        hiddenLayersSizes = network.hiddenLayersSizes.clone();
+
+        defineBlankStructureByCurrentOptions();
+        fillParametersWithRandomValues();
+
+        for (int i = 0; i < weights.length; ++i) {
+            weights[i] = new Matrix(network.weights[i]);
+        }
+
+        for (int i = 0; i < biases.length; ++i) {
+            biases[i] = new Matrix(network.biases[i]);
+        }
     }
 
     private void defineBlankStructureByCurrentOptions() {
