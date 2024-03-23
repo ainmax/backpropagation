@@ -37,23 +37,28 @@ public class Trainer {
         boolean isNetworkTrainedEnough = false;
 
         do {
-            double averageOutputError = 0;
+            double lastAverageOutputError = 0;
             lastTrainErrorsData = new double[trainEpochsQuantity];
 
             for (int i = 0; i < trainEpochsQuantity; ++i) {
                  network = trainEpochOffline(new NeuralNetwork(network));
 
                 // Average error calculating
+                testsBase.clearTestsQueue();
+
                 do {
                     TestsBase.Test currentTest = testsBase.nextTest();
-                    averageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
+                    lastAverageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
                 } while (testsBase.hasNextTest());
 
-                lastTrainErrorsData[i] = averageOutputError / testsBase.size;
+                lastAverageOutputError /= testsBase.size;
+                lastTrainErrorsData[i] = lastAverageOutputError;
             }
 
+            System.out.println(lastAverageOutputError);
+
             // If network wasn't trained enough to have average error smaller than maximal acceptable error - training restarts
-            if (averageOutputError > maxAcceptableAverageOutputError) {
+            if (lastAverageOutputError > maxAcceptableAverageOutputError) {
                 network = new NeuralNetwork(network.inputSize, network.outputSize, network.hiddenLayersSizes);
             } else {
                 isNetworkTrainedEnough = true;
@@ -68,6 +73,8 @@ public class Trainer {
         double[][] biasesErrorGradients = new double[testsBase.size][];
 
         // Define gradient for each test
+        testsBase.clearTestsQueue();
+
         while (testsBase.hasNextTest()) {
             TestsBase.Test currentTest = testsBase.nextTest();
             int i = testsBase.getCurrentTestIndex();
@@ -76,13 +83,11 @@ public class Trainer {
             biasesErrorGradients[i] = new BiasesOutputErrorGradient(network, currentTest).getOutputErrorGradient();
         }
 
-        testsBase.clearTestsQueue();
-
         // Calculating sum of weights error gradients
         double[] averageWeightsErrorGradient = weightsErrorGradients[0];
 
         for (int i = 1; i < weightsErrorGradients.length; ++i) {
-            for (int j = 0; j < weightsErrorGradients.length; ++j) {
+            for (int j = 0; j < weightsErrorGradients[i].length; ++j) {
                 averageWeightsErrorGradient[j] += weightsErrorGradients[i][j];
             }
         }
@@ -91,8 +96,7 @@ public class Trainer {
         double[] averageBiasesErrorGradient = biasesErrorGradients[0];
 
         for (int i = 1; i < biasesErrorGradients.length; ++i) {
-            for (int j = 0; j < biasesErrorGradients.length; ++j) {
-                averageWeightsErrorGradient[j] += weightsErrorGradients[i][j];
+            for (int j = 0; j < biasesErrorGradients[i].length; ++j) {
                 averageBiasesErrorGradient[j] += biasesErrorGradients[i][j];
             }
         }
@@ -114,17 +118,25 @@ public class Trainer {
         boolean isNetworkTrainedEnough = false;
 
         do {
+            double averageOutputError = 0;
+            lastTrainErrorsData = new double[trainEpochsQuantity];
+
             for (int i = 0; i < trainEpochsQuantity; ++i) {
                 network = trainEpochOnline(new NeuralNetwork(network));
+
+                // Average error calculating
+                testsBase.clearTestsQueue();
+
+                do {
+                    TestsBase.Test currentTest = testsBase.nextTest();
+                    averageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
+                } while (testsBase.hasNextTest());
+
+                averageOutputError /= testsBase.size;
+                lastTrainErrorsData[i] = averageOutputError;
             }
 
-            // Average error calculating
-            double averageOutputError = 0;
-
-            do {
-                TestsBase.Test currentTest = testsBase.nextTest();
-                averageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
-            } while (testsBase.hasNextTest());
+            System.out.println(averageOutputError);
 
             // If network wasn't trained enough to have average error smaller than maximal acceptable error - training restarts
             if (averageOutputError > maxAcceptableAverageOutputError) {
@@ -142,6 +154,8 @@ public class Trainer {
         double[] currentWeightGradient;
         double[] currentBiasGradient;
 
+        testsBase.clearTestsQueue();
+
         while (testsBase.hasNextTest()) {
             TestsBase.Test currentTest = testsBase.nextTest();
             currentWeightGradient = new WeightsOutputErrorGradient(network, currentTest).getOutputErrorGradient();
@@ -149,8 +163,6 @@ public class Trainer {
 
             tweakNetworkParametersByGradients(network, currentWeightGradient, currentBiasGradient);
         }
-
-        testsBase.clearTestsQueue();
 
         return network;
     }
