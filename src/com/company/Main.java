@@ -17,7 +17,7 @@ public class Main {
         Trainer trainer = new Trainer(neuralNetwork, testsBase);
         neuralNetwork = trainer.trainNetworkOffline(10000, 0.1);
 
-        double[] errors = trainer.getLastTrainErrorsData();
+        double[] neuralNetworkErrors = trainer.getLastTrainErrorsData();
 
         for (int i = 0; i < neuralNetwork.weights.length; ++i) {
             System.out.println(neuralNetwork.weights[i]);
@@ -29,7 +29,7 @@ public class Main {
             System.out.println();
         }
 
-        System.out.println(Arrays.toString(errors));
+        System.out.println(Arrays.toString(neuralNetworkErrors));
         System.out.println("--------------------------------------");
 
         Scanner in = new Scanner(System.in);
