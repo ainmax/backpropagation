@@ -91,7 +91,6 @@ public class NeuralNetwork {
 
         for (int i = 0; i < outputSize; ++i) {
             output[i] = outputMatrix.values[i][0];
-
         }
 
         return output;

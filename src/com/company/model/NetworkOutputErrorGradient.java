@@ -2,7 +2,7 @@ package com.company.model;
 
 import com.company.train.TestsBase;
 
-abstract class NetworkGradient {
+abstract class NetworkOutputErrorGradient {
     private final NeuralNetwork network;
     private final Matrix[] layersGradients;
     private final double[] errorFunctionGradient;
@@ -38,7 +38,7 @@ abstract class NetworkGradient {
            Gij[u][v] - partial derivative of A(i)[u] by W(j)[v]
      */
 
-    public NetworkGradient(NeuralNetwork network, TestsBase.Test test) {
+    public NetworkOutputErrorGradient(NeuralNetwork network, TestsBase.Test test) {
         this.network = network;
         layersGradients = new Matrix[network.hiddenLayersCount + 1];
 
@@ -46,27 +46,31 @@ abstract class NetworkGradient {
         errorFunctionGradient = calcErrorFunctionGradient(test);
     }
 
+    public double[] getOutputErrorGradient() {
+        return errorFunctionGradient;
+    }
+
     // Sigmoid function first derivative
     private double calcActivatedNodeValueDerivative(double nodeCharge) {
         return 1 / (2 + Math.pow(Math.exp(1), -nodeCharge) + Math.pow(Math.exp(1), nodeCharge));
     }
 
-    public double[] getErrorFunctionGradient() {
-        return errorFunctionGradient;
-    }
+    abstract double calcLinearFirstDerivative(double linearCoefficient);
+
+    abstract int getConnectedParametersCount(int previousLayerSize, int currentLayerSize);
 
     // Calculates base of recursion - partial derivatives of first hiddenLayer activations by parameters, connected to inputLayer
     private void calcFirstHiddenLayerGradient(double[] inputValues) {
         Matrix inputLayer = new Matrix(inputValues.length, 1, inputValues);
         Matrix inputLayerOutput = network.weights[0].multiply(inputLayer).plus(network.biases[0]);
-        layersGradients[0] = new Matrix(inputLayerOutput.N, network.inputSize * inputLayerOutput.N);
+        layersGradients[0] = new Matrix(inputLayerOutput.N, getConnectedParametersCount(inputLayer.N, inputLayerOutput.N));
 
         // Calculate piece of gradient with partial derivatives parameters from first hidden layer (by weights and biases, connected to current layer)
         for (int i = 0; i < inputLayerOutput.N; ++i) {
-            for (int k = 0; k < network.inputSize; ++k) {
-                layersGradients[0].values[i][i * network.inputSize + k] = calcLinearFirstDerivative(inputValues[k]);
+            for (int k = 0; k < getConnectedParametersCount(inputLayer.N, inputLayerOutput.N) / inputLayerOutput.N; ++k) {
+                layersGradients[0].values[i][i * getConnectedParametersCount(inputLayer.N, inputLayerOutput.N) / inputLayerOutput.N + k] = calcLinearFirstDerivative(inputValues[k]);
                 // Adds activation function partial derivative factor
-                layersGradients[0].values[i][i * network.inputSize + k] *= calcActivatedNodeValueDerivative(inputLayerOutput.values[i][0]);
+                layersGradients[0].values[i][i * getConnectedParametersCount(inputLayer.N, inputLayerOutput.N) / inputLayerOutput.N + k] *= calcActivatedNodeValueDerivative(inputLayerOutput.values[i][0]);
             }
         }
 
@@ -75,24 +79,18 @@ abstract class NetworkGradient {
 
     // Recursive function calculates all partial derivatives of next layer activations by all previous parameters, using partial derivatives which were calculated earlier
     private void calcNextLayerGradient(int currentLayerIndex, Matrix previousLayerInput, Matrix previousLayerOutput) {
-        // If this statement true, previous layer is output, so output gradient calculated and recursion must be stopped
-        if (currentLayerIndex >= network.hiddenLayersCount) {
-            return;
-        }
-
         int previousLayerSize = previousLayerInput.N;
         int currentLayerSize = previousLayerOutput.N;
 
         // Define empty gradient
-        layersGradients[currentLayerIndex] = new Matrix(previousLayerOutput.N, layersGradients[currentLayerIndex - 1].M + previousLayerSize * currentLayerSize);
-
+        layersGradients[currentLayerIndex] = new Matrix(currentLayerSize, layersGradients[currentLayerIndex - 1].M + getConnectedParametersCount(previousLayerSize, currentLayerSize));
 
         // Calculate piece of gradient with partial derivatives parameters from current layer (by weights and biases, connected to current layer)
         for (int i = 0; i < currentLayerSize; ++i) {
-            for (int k = 0; k < previousLayerSize; ++k) {
-                layersGradients[currentLayerIndex].values[i][i * previousLayerSize + k + layersGradients[currentLayerIndex - 1].M] = calcLinearFirstDerivative(previousLayerInput.values[k][0]);
+            for (int k = 0; k < getConnectedParametersCount(previousLayerSize, currentLayerSize) / currentLayerSize; ++k) {
+                layersGradients[currentLayerIndex].values[i][i * getConnectedParametersCount(previousLayerSize, currentLayerSize) / currentLayerSize + k + layersGradients[currentLayerIndex - 1].M] = calcLinearFirstDerivative(previousLayerInput.values[k][0]);
                 // Adds activation function partial derivative factor
-                layersGradients[currentLayerIndex].values[i][i * previousLayerSize + k + layersGradients[currentLayerIndex - 1].M] *= calcActivatedNodeValueDerivative(previousLayerOutput.values[i][0]);
+                layersGradients[currentLayerIndex].values[i][i * getConnectedParametersCount(previousLayerSize, currentLayerSize) / currentLayerSize + k + layersGradients[currentLayerIndex - 1].M] *= calcActivatedNodeValueDerivative(previousLayerOutput.values[i][0]);
             }
         }
 
@@ -105,6 +103,11 @@ abstract class NetworkGradient {
                 // Adds activation function partial derivative factor
                 layersGradients[currentLayerIndex].values[i][j] *= calcActivatedNodeValueDerivative(previousLayerOutput.values[i][0]);
             }
+        }
+
+        // If this statement true, previous layer is output, so output gradient calculated and recursion must be stopped
+        if (currentLayerIndex >= network.hiddenLayersCount) {
+            return;
         }
 
         Matrix nextLayerInput = network.hiddenLayers[currentLayerIndex].calcOutputBy(previousLayerOutput);
@@ -133,6 +136,4 @@ abstract class NetworkGradient {
 
         return errorFunctionGradient;
     }
-
-    abstract double calcLinearFirstDerivative(double lineCoefficient);
 }

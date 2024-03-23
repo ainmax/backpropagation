@@ -1,8 +1,8 @@
 package com.company.train;
 
-import com.company.model.BiasesGradient;
+import com.company.model.BiasesOutputErrorGradient;
 import com.company.model.NeuralNetwork;
-import com.company.model.WeightsGradient;
+import com.company.model.WeightsOutputErrorGradient;
 
 public class Trainer {
     private NeuralNetwork network;
@@ -18,7 +18,7 @@ public class Trainer {
         this.testsBase = testsBase;
     }
 
-    private static double calcOutputError(double[] output, double[] expectedOutput) {
+    public static double calcOutputError(double[] output, double[] expectedOutput) {
         double outputError = 0;
 
         for (int i = 0; i < output.length; ++i) {
@@ -72,8 +72,8 @@ public class Trainer {
             TestsBase.Test currentTest = testsBase.nextTest();
             int i = testsBase.getCurrentTestIndex();
 
-            weightsErrorGradients[i] = new WeightsGradient(network, currentTest).getErrorFunctionGradient();
-            biasesErrorGradients[i] = new BiasesGradient(network, currentTest).getErrorFunctionGradient();
+            weightsErrorGradients[i] = new WeightsOutputErrorGradient(network, currentTest).getOutputErrorGradient();
+            biasesErrorGradients[i] = new BiasesOutputErrorGradient(network, currentTest).getOutputErrorGradient();
         }
 
         testsBase.clearTestsQueue();
@@ -144,8 +144,8 @@ public class Trainer {
 
         while (testsBase.hasNextTest()) {
             TestsBase.Test currentTest = testsBase.nextTest();
-            currentWeightGradient = new WeightsGradient(network, currentTest).getErrorFunctionGradient();
-            currentBiasGradient = new BiasesGradient(network, currentTest).getErrorFunctionGradient();
+            currentWeightGradient = new WeightsOutputErrorGradient(network, currentTest).getOutputErrorGradient();
+            currentBiasGradient = new BiasesOutputErrorGradient(network, currentTest).getOutputErrorGradient();
 
             tweakNetworkParametersByGradients(network, currentWeightGradient, currentBiasGradient);
         }
