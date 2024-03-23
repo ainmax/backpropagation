@@ -79,18 +79,6 @@ public class Matrix {
         return multiplication;
     }
 
-    public Matrix multiply(double factor) {
-        Matrix multiplication = new Matrix(N, M);
-
-        for (int i = 0; i < N; ++i) {
-            for (int j = 0; j < M; ++j) {
-                multiplication.values[i][j] = values[i][j] * factor;
-            }
-        }
-
-        return multiplication;
-    }
-
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(Arrays.toString(values[0]));

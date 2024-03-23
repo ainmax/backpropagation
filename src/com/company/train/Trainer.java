@@ -8,7 +8,7 @@ public class Trainer {
     private NeuralNetwork network;
     private final TestsBase testsBase;
 
-    double[] lastTrainErrorsData;
+    private double[] lastTrainErrorsData;
 
     private static final double LEARN_SPEED = 0.1;
     private static final double COMPRESSION_COEFFICIENT = 1;
@@ -28,18 +28,31 @@ public class Trainer {
         return outputError;
     }
 
+    public double[] getLastTrainErrorsData() {
+        return lastTrainErrorsData;
+    }
+
+    // Trains network by tweaking its parameters after all tests' errors calculated
     public NeuralNetwork trainNetworkOffline(int trainEpochsQuantity, double maxAcceptableAverageOutputError) {
         boolean isNetworkTrainedEnough = false;
 
         do {
             double averageOutputError = 0;
+            lastTrainErrorsData = new double[trainEpochsQuantity];
 
             for (int i = 0; i < trainEpochsQuantity; ++i) {
                  network = trainEpochOffline(new NeuralNetwork(network));
+
+                // Average error calculating
+                do {
+                    TestsBase.Test currentTest = testsBase.nextTest();
+                    averageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
+                } while (testsBase.hasNextTest());
+
+                lastTrainErrorsData[i] = averageOutputError / testsBase.size;
             }
 
-            // !!!!!!!!!!!!!!!!!!!!!!! There should be network error research !!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+            // If network wasn't trained enough to have average error smaller than maximal acceptable error - training restarts
             if (averageOutputError > maxAcceptableAverageOutputError) {
                 network = new NeuralNetwork(network.inputSize, network.outputSize, network.hiddenLayersSizes);
             } else {
@@ -50,7 +63,6 @@ public class Trainer {
         return network;
     }
 
-    // Reweight network by gradients and returns average error
     private NeuralNetwork trainEpochOffline(NeuralNetwork network) {
         double[][] weightsErrorGradients = new double[testsBase.size][];
         double[][] biasesErrorGradients = new double[testsBase.size][];
@@ -97,19 +109,24 @@ public class Trainer {
         return tweakNetworkParametersByGradients(network, averageWeightsErrorGradient, averageBiasesErrorGradient);
     }
 
-    // Returns average error after every epoch
+    // Trains network by tweaking its parameters after any test's error calculated
     public NeuralNetwork trainNetworkOnline(int trainEpochsQuantity, double maxAcceptableAverageOutputError) {
         boolean isNetworkTrainedEnough = false;
 
         do {
-            double averageOutputError = 0;
-
             for (int i = 0; i < trainEpochsQuantity; ++i) {
                 network = trainEpochOnline(new NeuralNetwork(network));
             }
 
-            // !!!!!!!!!!!!!!!!!!!!!!! There should be network error research !!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // Average error calculating
+            double averageOutputError = 0;
 
+            do {
+                TestsBase.Test currentTest = testsBase.nextTest();
+                averageOutputError += calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
+            } while (testsBase.hasNextTest());
+
+            // If network wasn't trained enough to have average error smaller than maximal acceptable error - training restarts
             if (averageOutputError > maxAcceptableAverageOutputError) {
                 network = new NeuralNetwork(network.inputSize, network.outputSize, network.hiddenLayersSizes);
             } else {
