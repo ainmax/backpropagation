@@ -11,11 +11,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(2, 3, new int[] {3});
+        NeuralNetwork neuralNetwork = new NeuralNetwork(4, 5, new int[] {3, 3});
         TestsBase testsBase = new TestsBase(neuralNetwork.inputSize, testFunction.answerFunction);
 
         Trainer trainer = new Trainer(neuralNetwork, testsBase);
-        neuralNetwork = trainer.trainNetworkOffline(10000, 0.1);
+        neuralNetwork = trainer.trainNetworkOffline(10000, 0.01);
 
         double[] neuralNetworkErrors = trainer.getLastTrainErrorsData();
 

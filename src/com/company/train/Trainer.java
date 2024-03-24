@@ -10,7 +10,7 @@ public class Trainer {
 
     private double[] lastTrainErrorsData;
 
-    private static final double LEARN_SPEED = 0.1;
+    private static final double LEARN_SPEED = 1;
     private static final double COMPRESSION_COEFFICIENT = 1;
 
     public Trainer(NeuralNetwork network, TestsBase testsBase) {
