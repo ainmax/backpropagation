@@ -2,7 +2,7 @@ package com.company.train;
 
 import java.util.function.Function;
 
-public class TestsBase {
+public class TestSet {
     private final int inputSize;
     private final Function<double[], double[]> answerFunction;
     private Test[] tests;
@@ -10,7 +10,7 @@ public class TestsBase {
 
     private int currentTestIndex = -1;
 
-    public TestsBase(int inputSize, Function<double[], double[]> answerFunction) {
+    public TestSet(int inputSize, Function<double[], double[]> answerFunction) {
         this.inputSize = inputSize;
         this.answerFunction = answerFunction;
 
@@ -36,6 +36,18 @@ public class TestsBase {
             double[] clonedBitmask = bitmask.clone();
             tests[i] = new Test(clonedBitmask, answerFunction.apply(clonedBitmask));
         }
+    }
+
+    // Generates one simple test (1, 1, ..., 1)
+    private void generateOneTest() {
+        tests = new Test[1];
+
+        double[] bitmask = new double[inputSize];
+        for (int j = 0; j < inputSize; ++j) {
+            bitmask[j] = 1;
+        }
+
+        tests[0] = new Test(bitmask, answerFunction.apply(bitmask));
     }
 
     public Test nextTest() {

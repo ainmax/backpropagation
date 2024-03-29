@@ -11,7 +11,14 @@ public enum TestFunctionsEnum {
 
         return output;
     }),
-    PROJECTION(s -> new double[] { s[0] });
+    PROJECTION(s -> new double[] { s[0] }),
+    DIGIT_RECOGNIZE(s -> {
+        double[] output = new double[10];
+
+        output[0] = 1;
+
+        return output;
+    });
 
     public final Function<double[], double[]> answerFunction;
 

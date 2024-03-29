@@ -1,5 +1,6 @@
 package com.company.model;
 
+import com.company.model.network.NeuralNetwork;
 import com.company.train.Trainer;
 import org.junit.jupiter.api.Test;
 

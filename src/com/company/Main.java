@@ -1,9 +1,11 @@
 package com.company;
 
-import com.company.model.NeuralNetwork;
+import com.company.model.Matrix;
+import com.company.model.network.NeuralNetwork;
 import com.company.train.TestFunctionsEnum;
-import com.company.train.TestsBase;
+import com.company.train.TestSet;
 import com.company.train.Trainer;
+import com.company.train.TrainerOptions;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -11,11 +13,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(4, 5, new int[] {3, 3});
-        TestsBase testsBase = new TestsBase(neuralNetwork.inputSize, testFunction.answerFunction);
+        NeuralNetwork neuralNetwork = new NeuralNetwork(10, 11, new int[] {10, 10});
+        TrainerOptions trainerOptions = new TrainerOptions(0.1, 0.1, 10000, 0.1, 10);
 
-        Trainer trainer = new Trainer(neuralNetwork, testsBase);
-        neuralNetwork = trainer.trainNetworkOffline(10000, 0.01);
+        TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
+        Trainer trainer = new Trainer(neuralNetwork, testSet, trainerOptions);
+
+        neuralNetwork = trainer.trainNetworkOnline();
 
         double[] neuralNetworkErrors = trainer.getLastTrainErrorsData();
 
@@ -47,10 +51,12 @@ public class Main {
             }
 
             System.out.println();
-            System.out.print("Output: ");
+            System.out.print("Precise output: ");
             System.out.println(Arrays.toString(neuralNetwork.calcOutputBy(userInput)));
+            System.out.print("Simplified output: ");
+            System.out.println(new Matrix(1, neuralNetwork.outputSize, neuralNetwork.calcOutputBy(userInput)));
             System.out.print("Correct output: ");
-            System.out.println(Arrays.toString(testFunction.answerFunction.apply(userInput)));
+            System.out.println(new Matrix(1, neuralNetwork.outputSize, testFunction.answerFunction.apply(userInput)));
             System.out.println("--------------------------------------");
         }
 

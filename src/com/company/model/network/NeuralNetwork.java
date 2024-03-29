@@ -1,4 +1,7 @@
-package com.company.model;
+package com.company.model.network;
+
+import com.company.model.Matrix;
+import com.company.model.RandomMatrix;
 
 // Neural network model
 public class NeuralNetwork {
@@ -9,8 +12,8 @@ public class NeuralNetwork {
     public final int[] hiddenLayersSizes;
 
     // Structure elements
-    Layer outputLayer;
-    Layer[] hiddenLayers;
+    public Layer outputLayer;
+    public Layer[] hiddenLayers;
 
     // Current parameters values
     public Matrix[] weights;
@@ -53,24 +56,27 @@ public class NeuralNetwork {
 
     private void defineBlankStructureByCurrentOptions() {
         hiddenLayers = new Layer[hiddenLayersCount];
-        outputLayer = new Layer(outputSize, hiddenLayersCount);
 
         // Define layers
         for (int i = 0; i < hiddenLayersCount; ++i) {
-            hiddenLayers[i] = new Layer(hiddenLayersSizes[i], i);
+            hiddenLayers[i] = new Layer();
         }
+
+        outputLayer = new Layer();
     }
 
     private void fillParametersWithRandomValues() {
         biases = new Matrix[hiddenLayersCount + 1];
         weights = new Matrix[hiddenLayersCount + 1];
+
+        // Fill parameters
         weights[0] = new RandomMatrix(hiddenLayersSizes[0], inputSize);
 
         for (int i = 0; i < hiddenLayersCount; ++i) {
             biases[i] = new RandomMatrix(hiddenLayersSizes[i], 1);
 
             if (i < hiddenLayersCount - 1) {
-                weights[i + 1] = new Matrix(hiddenLayersSizes[i + 1], hiddenLayersSizes[i]);
+                weights[i + 1] = new RandomMatrix(hiddenLayersSizes[i + 1], hiddenLayersSizes[i]);
             }
         }
 
@@ -79,14 +85,17 @@ public class NeuralNetwork {
     }
 
     public double[] calcOutputBy(double[] inputValues) {
-        Matrix inputLayer = new Matrix(inputSize, 1, inputValues);
-        Matrix previousLayerOutput = weights[0].multiply(inputLayer).plus(biases[0]);
+        Matrix previousLayerOutput = new Matrix(inputSize, 1, inputValues);
 
         for (int i = 0; i < hiddenLayersCount; ++i) {
-            previousLayerOutput = hiddenLayers[i].calcOutputBy(previousLayerOutput);
+            // Formula for layer output is W * A + B, where W - weights between current and next layers, B - biases
+            previousLayerOutput = hiddenLayers[i].apply(weights[i].multiply(previousLayerOutput).plus(biases[i]));
         }
 
-        Matrix outputMatrix = outputLayer.calcActivatedValues(previousLayerOutput);
+        // Formula for layer output is W * A + B, where W - weights between current and next layers, B - biases
+        Matrix outputMatrix = outputLayer.apply(weights[hiddenLayersCount].multiply(previousLayerOutput).plus(biases[hiddenLayersCount]));
+
+        // Convert matrix to array
         double[] output = new double[outputSize];
 
         for (int i = 0; i < outputSize; ++i) {
@@ -96,27 +105,15 @@ public class NeuralNetwork {
         return output;
     }
 
-    class Layer {
-        final int index;
-        final int size;
+    public class Layer { /// todo rename to HiddenLayer
 
-        Layer(int size, int index) {
-            this.index = index;
-            this.size = size;
-        }
+        private Layer() {}
 
-        Matrix calcOutputBy(Matrix previousLayerOutput) {
-            Matrix activatedNodesValues = calcActivatedValues(previousLayerOutput);
-
-            // Formula for layer output is W * A + B, where W - weights between current and next layers, B - biases
-            return weights[index + 1].multiply(activatedNodesValues).plus(biases[index + 1]);
-        }
-
-        Matrix calcActivatedValues(Matrix previousLayerOutput) {
+        public Matrix apply(Matrix previousLayerOutput) {
             Matrix activatedValues = new Matrix(previousLayerOutput);
 
             // Each element in nodesValues transform by activate function
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < previousLayerOutput.N; ++i) {
                 activatedValues.values[i][0] = calcActivatedNodeValue(previousLayerOutput.values[i][0]);
             }
 

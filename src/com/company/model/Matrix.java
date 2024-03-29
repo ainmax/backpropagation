@@ -81,10 +81,18 @@ public class Matrix {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(Arrays.toString(values[0]));
+        StringBuilder result = new StringBuilder();
 
-        for (int i = 1; i < N; ++i) {
-            result.append('\n').append(Arrays.toString(values[i]));
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < M; ++j) {
+                result.append(Math.round(values[i][j] * 10) / 10.0);
+
+                if (j + 1 < M) {
+                    result.append(", ");
+                }
+            }
+
+            result.append('\n');
         }
 
         return result.toString();

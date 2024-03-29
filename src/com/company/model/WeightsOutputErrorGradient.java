@@ -1,9 +1,10 @@
 package com.company.model;
 
-import com.company.train.TestsBase;
+import com.company.model.network.NeuralNetwork;
+import com.company.train.TestSet;
 
 public class WeightsOutputErrorGradient extends NetworkOutputErrorGradient {
-    public WeightsOutputErrorGradient(NeuralNetwork network, TestsBase.Test test) {
+    public WeightsOutputErrorGradient(NeuralNetwork network, TestSet.Test test) {
         super(network, test);
     }
 
