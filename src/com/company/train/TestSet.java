@@ -1,6 +1,7 @@
 package com.company.train;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -17,7 +18,7 @@ public class TestSet {
         this.inputSize = inputSize;
         this.answerFunction = answerFunction;
 
-        generateBitmaskTestSet();
+        generateDefectiveBitmaskTestSet();
         size = tests.size();
     }
 
@@ -42,6 +43,31 @@ public class TestSet {
         Collections.shuffle(tests);
     }
 
+    // Generates all bitmasks with length inputSize
+    private void generateDefectiveBitmaskTestSet() {
+        double[] bitmask = new double[inputSize];
+
+        for (int i = 0; i < (int)Math.pow(2, inputSize); ++i) {
+            for (int j = 0; j < inputSize; ++j) {
+                if (bitmask[j] == 0) {
+                    bitmask[j] = 1;
+                    break;
+                }
+
+                bitmask[j] = 0;
+            }
+
+            double[] clonedBitmask = bitmask.clone();
+
+            if (!Arrays.equals(clonedBitmask, new double[] {1, 1, 0, 0, 0, 1, 1, 0, 1, 0})) {
+                tests.add(new Test(clonedBitmask, answerFunction.apply(clonedBitmask)));
+            }
+        }
+
+        Collections.shuffle(tests);
+    }
+
+    // Generates bitmasks like (1, 1, ..., 1, 0, ..., 0)
     private void generateTwoPowersBitmasks() {
         double[] bitmask = new double[inputSize];
         int size = inputSize + 1;

@@ -1,5 +1,6 @@
-package com.company.model;
+package com.company.train.gradient;
 
+import com.company.model.Matrix;
 import com.company.model.network.NeuralNetwork;
 import com.company.train.TestSet;
 

@@ -2,7 +2,9 @@ package com.company.model;
 
 import com.company.model.network.NeuralNetwork;
 import com.company.train.TestSet;
-import com.company.train.Trainer;
+import com.company.train.trainer.Trainer;
+import com.company.train.gradient.BiasesOutputErrorGradient;
+import com.company.train.gradient.WeightsOutputErrorGradient;
 import org.junit.jupiter.api.Test;
 
 class WeightsGradientTest {

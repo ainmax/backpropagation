@@ -4,8 +4,9 @@ import com.company.model.Matrix;
 import com.company.model.network.NeuralNetwork;
 import com.company.train.TestFunctionsEnum;
 import com.company.train.TestSet;
-import com.company.train.Trainer;
-import com.company.train.TrainerOptions;
+import com.company.train.trainer.OnlineTrainer;
+import com.company.train.trainer.Trainer;
+import com.company.train.trainer.TrainerOptions;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -13,15 +14,16 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(4, 5, new int[] {1});
-        TrainerOptions trainerOptions = new TrainerOptions(1, 0, 100000, 0.0001, 0.001);
+        NeuralNetwork neuralNetwork = new NeuralNetwork(10, 11, new int[] {8, 8});
+        TrainerOptions trainerOptions = new TrainerOptions(0.2, 0.1, 1000, 0.02, 3);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
-        Trainer trainer = new Trainer(neuralNetwork, testSet, trainerOptions);
+        Trainer onlineTrainer = new OnlineTrainer(neuralNetwork, testSet, trainerOptions);
 
-        neuralNetwork = trainer.trainNetworkOnline();
+        neuralNetwork = onlineTrainer.trainNetwork();
 
-        double[] neuralNetworkErrors = trainer.getLastTrainErrorsData();
+        double[] neuralNetworkErrors = onlineTrainer.getLastTrainErrorsData();
+        System.out.println(Arrays.toString(neuralNetworkErrors));
 
         for (int i = 0; i < neuralNetwork.weights.length; ++i) {
             System.out.println(neuralNetwork.weights[i]);
@@ -33,7 +35,6 @@ public class Main {
             System.out.println();
         }
 
-        System.out.println(Arrays.toString(neuralNetworkErrors));
         System.out.println("--------------------------------------");
 
         Scanner in = new Scanner(System.in);
