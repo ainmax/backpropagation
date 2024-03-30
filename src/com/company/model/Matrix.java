@@ -1,7 +1,5 @@
 package com.company.model;
 
-import java.util.Arrays;
-
 public class Matrix {
     public final int N; // Vertical (v-) dimension (first index)
     public final int M; // Horizontal (h-) dimension (second index)
@@ -77,6 +75,21 @@ public class Matrix {
         }
 
         return multiplication;
+    }
+
+    // Each element in input transforms by sigmoid function
+    public static Matrix sigmoidOf(Matrix input) {
+        Matrix output = new Matrix(input);
+
+        for (int i = 0; i < input.N; ++i) {
+            output.values[i][0] = sigmoid(input.values[i][0]);
+        }
+
+        return output;
+    }
+
+    private static double sigmoid(double x) {
+        return 1 / (1 + Math.pow(Math.exp(1), -x));
     }
 
     @Override

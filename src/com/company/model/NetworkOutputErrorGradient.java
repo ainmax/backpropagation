@@ -82,7 +82,7 @@ abstract class NetworkOutputErrorGradient {
 
         // If currentLayer - first, there is no deep gradient
         if (currentLayerIndex == 0) {
-            Matrix currentLayerOutput = network.hiddenLayers[currentLayerIndex].apply(currentLayerInput);
+            Matrix currentLayerOutput = Matrix.sigmoidOf(currentLayerInput);
             calcNextLayerGradient(currentLayerIndex + 1, currentLayerSize, currentLayerOutput);
             return;
         }
@@ -103,7 +103,7 @@ abstract class NetworkOutputErrorGradient {
             return;
         }
 
-        Matrix currentLayerOutput = network.hiddenLayers[currentLayerIndex].apply(currentLayerInput);
+        Matrix currentLayerOutput = Matrix.sigmoidOf(currentLayerInput);
         calcNextLayerGradient(currentLayerIndex + 1, currentLayerSize, currentLayerOutput);
     }
 

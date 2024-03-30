@@ -13,8 +13,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(10, 11, new int[] {10, 10});
-        TrainerOptions trainerOptions = new TrainerOptions(0.1, 0.1, 10000, 0.1, 10);
+        NeuralNetwork neuralNetwork = new NeuralNetwork(4, 5, new int[] {1});
+        TrainerOptions trainerOptions = new TrainerOptions(1, 0, 100000, 0.0001, 0.001);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
         Trainer trainer = new Trainer(neuralNetwork, testSet, trainerOptions);
