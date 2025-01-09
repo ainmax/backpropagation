@@ -1,9 +1,9 @@
 package com.company.train;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Function;
 
 public class TestSet {
@@ -18,8 +18,64 @@ public class TestSet {
         this.inputSize = inputSize;
         this.answerFunction = answerFunction;
 
-        generateDefectiveBitmaskTestSet();
+        generateBitmaskTestSet();
+
         size = tests.size();
+    }
+
+    private void generateDigitsImagesTestSet() {
+        FileInputStream inputStream = null;
+        Scanner sc = null;
+
+        try {
+            inputStream = new FileInputStream("C:/Users/aynur/desktop/nn/dataset/MNIST_txt/MNIST_train.txt");
+            sc = new Scanner(inputStream, StandardCharsets.UTF_8);
+
+            String[] pixels;
+            int answer;
+
+            double[] correctOutput;
+            double[] input;
+
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+
+                pixels = Arrays.copyOfRange(line.split(","), 1, line.split(",").length);
+                answer = Integer.parseInt(line.substring(0, 1));
+
+                input = new double[pixels.length];
+                correctOutput = new double[10];
+
+                for (int i = 0; i < pixels.length; ++i) {
+                    input[i] = Integer.parseInt(pixels[i]);
+                }
+
+                correctOutput[answer] = 1;
+
+
+                tests.add(new Test(input.clone(), correctOutput.clone()));
+            }
+
+            if (sc.ioException() != null) {
+                throw sc.ioException();
+            }
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (sc != null) {
+            sc.close();
+        }
+
+        Collections.shuffle(tests);
     }
 
     // Generates all bitmasks with length inputSize
@@ -110,6 +166,7 @@ public class TestSet {
 
     public void clearTestsQueue() {
         currentTestIndex = -1;
+        Collections.shuffle(tests);
     }
 
     public boolean hasNextTest() {

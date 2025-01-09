@@ -4,6 +4,7 @@ import com.company.model.Matrix;
 import com.company.model.network.NeuralNetwork;
 import com.company.train.TestFunctionsEnum;
 import com.company.train.TestSet;
+import com.company.train.trainer.OfflineTrainer;
 import com.company.train.trainer.OnlineTrainer;
 import com.company.train.trainer.Trainer;
 import com.company.train.trainer.TrainerOptions;
@@ -15,14 +16,14 @@ public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
         NeuralNetwork neuralNetwork = new NeuralNetwork(10, 11, new int[] {8, 8});
-        TrainerOptions trainerOptions = new TrainerOptions(0.2, 0.1, 1000, 0.02, 3);
+        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 1000, 50, 0.02, 3);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
-        Trainer onlineTrainer = new OnlineTrainer(neuralNetwork, testSet, trainerOptions);
+        Trainer offlineTrainer = new OfflineTrainer(neuralNetwork, testSet, trainerOptions);
 
-        neuralNetwork = onlineTrainer.trainNetwork();
+        neuralNetwork = offlineTrainer.trainNetwork();
 
-        double[] neuralNetworkErrors = onlineTrainer.getLastTrainErrorsData();
+        double[] neuralNetworkErrors = offlineTrainer.getLastTrainErrorsData();
         System.out.println(Arrays.toString(neuralNetworkErrors));
 
         for (int i = 0; i < neuralNetwork.weights.length; ++i) {

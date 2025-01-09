@@ -36,8 +36,53 @@ public abstract class Trainer {
         return lastTrainErrorsData;
     }
 
-    // Trains network by tweaking its parameters after all tests' errors calculated
-    public abstract NeuralNetwork trainNetwork();
+    // Trains network by tweaking its parameters
+    public NeuralNetwork trainNetwork() {
+        boolean isNetworkTrainedEnough = false;
+
+        do {
+            lastTrainErrorsData = new double[options.trainEpochsCount()];
+
+            for (int i = 0; i < options.trainEpochsCount(); ++i) {
+                // Tweak network's parameters
+                network = trainEpoch(new NeuralNetwork(network));
+
+                // Average error calculating
+                testSet.clearTestsQueue();
+
+                double maxOutputError = 0;
+                double averageOutputError = 0;
+
+                do {
+                    TestSet.Test currentTest = testSet.nextTest();
+                    double error = calcOutputError(network.calcOutputBy(currentTest.input()), currentTest.correctOutput());
+                    averageOutputError += error;
+                    maxOutputError = Math.max(maxOutputError, error);
+                } while (testSet.hasNextTest());
+
+                averageOutputError /= testSet.size;
+                lastTrainErrorsData[i] = averageOutputError;
+
+                System.out.printf("%f -- %f%n", averageOutputError, maxOutputError);
+
+                if (averageOutputError <= options.maxAcceptableAverageOutputError() && maxOutputError <= options.maxAcceptableOutputError()) {
+                    isNetworkTrainedEnough = true;
+                    break;
+                }
+            }
+
+            System.out.println(lastTrainErrorsData[lastTrainErrorsData.length - 1]);
+
+            // If network wasn't trained enough to have average error smaller than maximal acceptable error - training restarts
+            if (!isNetworkTrainedEnough) {
+                network = new NeuralNetwork(network.inputSize, network.outputSize, network.hiddenLayersSizes);
+            }
+        } while (!isNetworkTrainedEnough);
+
+        return network;
+    }
+
+    abstract NeuralNetwork trainEpoch(NeuralNetwork network);
 
     NeuralNetwork tweakNetworkParametersByGradients(NeuralNetwork network, double[] weightsErrorGradient, double[] biasesErrorGradient) {
         // Weights tweak
