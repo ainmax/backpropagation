@@ -16,4 +16,4 @@ Development history:
 12) Um... What the hell is written there?..
 13) Bug with biases gradient calculating fixed.
 14) Debugging...
-15) Holy sh.... It works! I trained neural network!!!
+15) Wow, It works at least!
