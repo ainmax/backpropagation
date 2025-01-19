@@ -18,7 +18,7 @@ public class TestSet {
         this.inputSize = inputSize;
         this.answerFunction = answerFunction;
 
-        generateBitmaskTestSet();
+        generateDigitsImagesTestSet();
 
         size = tests.size();
     }
@@ -47,10 +47,10 @@ public class TestSet {
                 correctOutput = new double[10];
 
                 for (int i = 0; i < pixels.length; ++i) {
-                    input[i] = Integer.parseInt(pixels[i]);
+                    input[i] = Integer.parseInt(pixels[i]) / 255.0;
                 }
 
-                correctOutput[answer] = 1;
+                correctOutput[answer] = 1.0;
 
 
                 tests.add(new Test(input.clone(), correctOutput.clone()));

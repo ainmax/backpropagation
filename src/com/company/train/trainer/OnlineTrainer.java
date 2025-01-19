@@ -46,8 +46,8 @@ public class OnlineTrainer extends Trainer{
                 }
 
                 // Calculate output error
-                currentWeightGradient = new WeightsOutputErrorGradient(network, currentTest).getOutputErrorGradient();
-                currentBiasGradient = new BiasesOutputErrorGradient(network, currentTest).getOutputErrorGradient();
+                currentWeightGradient = (new WeightsOutputErrorGradient(network, currentTest).getOutputErrorGradient()).values[0];
+                currentBiasGradient = (new BiasesOutputErrorGradient(network, currentTest).getOutputErrorGradient()).values[0];
 
                 // Tweak network's parameters
                 tweakNetworkParametersByGradients(network, currentWeightGradient, currentBiasGradient);

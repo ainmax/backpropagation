@@ -1,5 +1,8 @@
 package com.company.model;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 public class Matrix {
     public final int N; // Vertical (v-) dimension (first index)
     public final int M; // Horizontal (h-) dimension (second index)
@@ -20,6 +23,16 @@ public class Matrix {
         for (int i = 0; i < N; ++i) {
             System.arraycopy(values, M * i, this.values[i], 0, M);
         }
+    }
+
+    public Matrix(double[][] values) {
+        if (values.length == 0) {
+            throw new IllegalArgumentException("Bad argument for matrix initialization. There are no values.");
+        }
+
+        N = values.length;
+        M = values[0].length;
+        this.values = values;
     }
 
     // Makes matrix by another matrix
@@ -57,7 +70,37 @@ public class Matrix {
         return sum;
     }
 
-    // This - first operand, parameter - second operand
+    // Throws exception if dimensions don't equal
+    public Matrix add(Matrix term) {
+        if (N != term.N || M != term.M) {
+            throw new IllegalArgumentException("Bad argument for matrix multiplication. Dimensions don't equal.");
+        }
+
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < M; ++j) {
+                values[i][j] += term.values[i][j];
+            }
+        }
+
+        return this;
+    }
+
+    // Throws exception if dimensions don't equal
+    public Matrix subtract(Matrix term) {
+        if (N != term.N || M != term.M) {
+            throw new IllegalArgumentException("Bad argument for matrix multiplication. Dimensions don't equal.");
+        }
+
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < M; ++j) {
+                values[i][j] -= term.values[i][j];
+            }
+        }
+
+        return this;
+    }
+
+    // This - left operand, parameter - right operand
     // Throws exception if dimensions don't match criteria of matrix multiplication
     public Matrix multiply(Matrix factor) {
         if (M != factor.N) {
@@ -98,7 +141,7 @@ public class Matrix {
 
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < M; ++j) {
-                result.append(Math.round(values[i][j] * 10) / 10.0);
+                result.append(values[i][j]);
 
                 if (j + 1 < M) {
                     result.append(", ");

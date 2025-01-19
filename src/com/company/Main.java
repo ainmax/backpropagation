@@ -15,8 +15,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(10, 11, new int[] {8, 8});
-        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 1000, 50, 0.02, 3);
+        NeuralNetwork neuralNetwork = new NeuralNetwork(784, 10, new int[] {32, 16});
+        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 10000, 1000, 0.02, 3);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
         Trainer offlineTrainer = new OfflineTrainer(neuralNetwork, testSet, trainerOptions);
@@ -57,8 +57,8 @@ public class Main {
             System.out.println(Arrays.toString(neuralNetwork.calcOutputBy(userInput)));
             System.out.print("Simplified output: ");
             System.out.println(new Matrix(1, neuralNetwork.outputSize, neuralNetwork.calcOutputBy(userInput)));
-            System.out.print("Correct output: ");
-            System.out.println(new Matrix(1, neuralNetwork.outputSize, testFunction.answerFunction.apply(userInput)));
+//            System.out.print("Correct output: ");
+//            System.out.println(new Matrix(1, neuralNetwork.outputSize, testFunction.answerFunction.apply(userInput)));
             System.out.println("--------------------------------------");
         }
 

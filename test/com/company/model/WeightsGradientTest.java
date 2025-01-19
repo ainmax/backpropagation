@@ -17,7 +17,7 @@ class WeightsGradientTest {
         WeightsOutputErrorGradient weightsOutputErrorGradient = new WeightsOutputErrorGradient(network, new TestSet.Test(new double[] {1, 0, 1}, new double[] {0.866, 0.688}));
         BiasesOutputErrorGradient biasesOutputErrorGradient = new BiasesOutputErrorGradient(network, new TestSet.Test(new double[] {1, 0, 1}, new double[] {0.866, 0.688}));
 
-        assert Trainer.calcOutputError(weightsOutputErrorGradient.getOutputErrorGradient(), new double[30]) < 0.000001;
-        assert Trainer.calcOutputError(biasesOutputErrorGradient.getOutputErrorGradient(), new double[30]) < 0.000001;
+        assert Trainer.calcOutputError(weightsOutputErrorGradient.getOutputErrorGradient().values[0], new double[30]) < 0.000001;
+        assert Trainer.calcOutputError(biasesOutputErrorGradient.getOutputErrorGradient().values[0], new double[30]) < 0.000001;
     }
 }

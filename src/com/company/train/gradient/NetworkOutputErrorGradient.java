@@ -7,7 +7,7 @@ import com.company.train.TestSet;
 abstract class NetworkOutputErrorGradient {
     private final NeuralNetwork network;
     private final Matrix[] layersGradients;
-    private final double[] errorFunctionGradient;
+    private final Matrix errorFunctionGradient;
 
     /*
     Gradient storage structure:
@@ -50,7 +50,7 @@ abstract class NetworkOutputErrorGradient {
         errorFunctionGradient = calcErrorFunctionGradient(test);
     }
 
-    public double[] getOutputErrorGradient() {
+    public Matrix getOutputErrorGradient() {
         return errorFunctionGradient;
     }
 
@@ -66,7 +66,7 @@ abstract class NetworkOutputErrorGradient {
     // Recursive function calculates all partial derivatives of next layer activations by all previous parameters, using partial derivatives which were calculated earlier
     private void calcNextLayerGradient(int currentLayerIndex, int previousLayerSize, Matrix previousLayerOutput) {
         // Formula for layer output is W * A + B, where W - weights between current and next layers, B - biases
-        Matrix currentLayerInput = network.weights[currentLayerIndex].multiply(previousLayerOutput).plus(network.biases[currentLayerIndex]);
+        Matrix currentLayerInput = network.weights[currentLayerIndex].multiply(previousLayerOutput).add(network.biases[currentLayerIndex]);
         int currentLayerSize = currentLayerInput.N;
 
         // Define empty gradient
@@ -99,7 +99,7 @@ abstract class NetworkOutputErrorGradient {
             }
         }
 
-        // If this statement true, previous layer is output, so output gradient calculated and recursion must be stopped
+        // If this statement true, previous layer is output, so output gradient is calculated and recursion must be stopped
         if (currentLayerIndex >= network.hiddenLayersCount) {
             return;
         }
@@ -108,7 +108,7 @@ abstract class NetworkOutputErrorGradient {
         calcNextLayerGradient(currentLayerIndex + 1, currentLayerSize, currentLayerOutput);
     }
 
-    private double[] calcErrorFunctionGradient(TestSet.Test test) {
+    private Matrix calcErrorFunctionGradient(TestSet.Test test) {
         double[] networkOutput = network.calcOutputBy(test.input());
         Matrix errorFunctionGradientMatrix = new Matrix(layersGradients[layersGradients.length - 1]);
 
@@ -128,6 +128,6 @@ abstract class NetworkOutputErrorGradient {
             }
         }
 
-        return errorFunctionGradient;
+        return new Matrix(1, errorFunctionGradient.length, errorFunctionGradient);
     }
 }
