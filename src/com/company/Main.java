@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
         NeuralNetwork neuralNetwork = new NeuralNetwork(784, 10, new int[] {32, 16});
-        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 10000, 1000, 0.02, 3);
+        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 10000, 128, 0.02, 3);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
         Trainer offlineTrainer = new OfflineTrainer(neuralNetwork, testSet, trainerOptions);

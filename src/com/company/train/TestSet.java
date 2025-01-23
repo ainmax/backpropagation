@@ -19,6 +19,7 @@ public class TestSet {
         this.answerFunction = answerFunction;
 
         generateDigitsImagesTestSet();
+//        generateBitmaskTestSet();
 
         size = tests.size();
     }

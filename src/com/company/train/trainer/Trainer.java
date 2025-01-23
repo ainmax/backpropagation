@@ -4,6 +4,9 @@ import com.company.train.TestSet;
 import com.company.model.Matrix;
 import com.company.model.network.NeuralNetwork;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 public abstract class Trainer {
     NeuralNetwork network;
     final TestSet testSet;
@@ -64,6 +67,7 @@ public abstract class Trainer {
                 lastTrainErrorsData[i] = averageOutputError;
 
                 System.out.printf("%f -- %f%n", averageOutputError, maxOutputError);
+                saveTrainData();
 
                 if (averageOutputError <= options.maxAcceptableAverageOutputError() && maxOutputError <= options.maxAcceptableOutputError()) {
                     isNetworkTrainedEnough = true;
@@ -108,5 +112,27 @@ public abstract class Trainer {
         }
 
         return network;
+    }
+
+    void saveTrainData() {
+        String fileName = "C:\\Users\\aynur\\backpropagation\\src\\com\\company\\processes_data\\train-data.txt";
+        FileWriter writer;
+
+        try {
+            writer = new FileWriter(fileName, true);
+            for (int i = 0; i < network.weights.length; ++i) {
+                writer.append(network.weights[i].toString());
+                writer.append('\n');
+                writer.append(network.biases[i].toString());
+                writer.append('\n');
+            }
+
+            writer.append("$\n");
+
+            writer.flush( );
+            writer.close( );
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
