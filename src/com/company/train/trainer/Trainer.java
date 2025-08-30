@@ -115,16 +115,16 @@ public abstract class Trainer {
     }
 
     void saveTrainData() {
-        String fileName = "C:\\Users\\aynur\\backpropagation\\src\\com\\company\\processes_data\\train-data.txt";
+        String fileName = "C:\\Users\\Айнур\\backpropagation\\src\\com\\company\\processes_data\\train-data.txt";
         FileWriter writer;
 
         try {
             writer = new FileWriter(fileName, true);
             for (int i = 0; i < network.weights.length; ++i) {
                 writer.append(network.weights[i].toString());
-                writer.append('\n');
+                writer.append("e\n");
                 writer.append(network.biases[i].toString());
-                writer.append('\n');
+                writer.append("e\n");
             }
 
             writer.append("$\n");

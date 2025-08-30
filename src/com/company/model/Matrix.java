@@ -56,7 +56,7 @@ public class Matrix {
     // Throws exception if dimensions don't equal
     public Matrix plus(Matrix term) {
         if (N != term.N || M != term.M) {
-            throw new IllegalArgumentException("Bad argument for matrix multiplication. Dimensions don't equal.");
+            throw new IllegalArgumentException("Bad argument for matrix summation. Dimensions don't equal.");
         }
 
         Matrix sum = new Matrix(this);
@@ -70,10 +70,26 @@ public class Matrix {
         return sum;
     }
 
+    public Matrix minus(Matrix term) {
+        if (N != term.N || M != term.M) {
+            throw new IllegalArgumentException("Bad argument for matrix subtraction. Dimensions don't equal.");
+        }
+
+        Matrix sum = new Matrix(this);
+
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < M; ++j) {
+                sum.values[i][j] -= term.values[i][j];
+            }
+        }
+
+        return sum;
+    }
+
     // Throws exception if dimensions don't equal
     public Matrix add(Matrix term) {
         if (N != term.N || M != term.M) {
-            throw new IllegalArgumentException("Bad argument for matrix multiplication. Dimensions don't equal.");
+            throw new IllegalArgumentException("Bad argument for matrix summation. Dimensions don't equal.");
         }
 
         for (int i = 0; i < N; ++i) {
@@ -88,7 +104,7 @@ public class Matrix {
     // Throws exception if dimensions don't equal
     public Matrix subtract(Matrix term) {
         if (N != term.N || M != term.M) {
-            throw new IllegalArgumentException("Bad argument for matrix multiplication. Dimensions don't equal.");
+            throw new IllegalArgumentException("Bad argument for matrix subtraction. Dimensions don't equal.");
         }
 
         for (int i = 0; i < N; ++i) {

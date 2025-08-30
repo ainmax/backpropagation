@@ -1,10 +1,13 @@
 package com.company.train;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class TestSet {
     private final int inputSize;
@@ -18,62 +21,38 @@ public class TestSet {
         this.inputSize = inputSize;
         this.answerFunction = answerFunction;
 
-        generateDigitsImagesTestSet();
+        generateDigitsImagesTestSet("C:/Users/Айнур/Desktop/traindataset7819.txt");
 //        generateBitmaskTestSet();
 
         size = tests.size();
     }
 
-    private void generateDigitsImagesTestSet() {
-        FileInputStream inputStream = null;
-        Scanner sc = null;
+    private void generateDigitsImagesTestSet(String path) {
+        ArrayList<String> lines = new ArrayList<>();
 
-        try {
-            inputStream = new FileInputStream("C:/Users/aynur/desktop/nn/dataset/MNIST_txt/MNIST_train.txt");
-            sc = new Scanner(inputStream, StandardCharsets.UTF_8);
-
-            String[] pixels;
-            int answer;
-
-            double[] correctOutput;
-            double[] input;
-
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-
-                pixels = Arrays.copyOfRange(line.split(","), 1, line.split(",").length);
-                answer = Integer.parseInt(line.substring(0, 1));
-
-                input = new double[pixels.length];
-                correctOutput = new double[10];
-
-                for (int i = 0; i < pixels.length; ++i) {
-                    input[i] = Integer.parseInt(pixels[i]) / 255.0;
-                }
-
-                correctOutput[answer] = 1.0;
-
-
-                tests.add(new Test(input.clone(), correctOutput.clone()));
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String nextLine = reader.readLine();
+            while (nextLine != null) {
+                lines.add(nextLine);
+                nextLine = reader.readLine();
             }
-
-            if (sc.ioException() != null) {
-                throw sc.ioException();
-            }
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Something wrong with dataset reading");
         }
 
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        for (int i = 0; i < lines.size(); ++i) {
+            double[] testOutput = new double[10];
+            testOutput[Integer.parseInt(lines.get(i).substring(0, 1))] = 1;
 
-        if (sc != null) {
-            sc.close();
+            Stream<Double> pixelValuesStream = Arrays.stream(lines.get(i).split(",")).map(number -> Double.parseDouble(number) / 255);
+            ArrayList<Double> pixelValues = new ArrayList<>(pixelValuesStream.toList());
+
+            double[] testInput = new double[pixelValues.size() - 1];
+            for (int j = 0; j < pixelValues.size() - 1; ++j) {
+                testInput[j] = pixelValues.get(j + 1);
+            }
+
+            tests.add(new Test(testInput, testOutput));
         }
 
         Collections.shuffle(tests);
@@ -124,7 +103,7 @@ public class TestSet {
         Collections.shuffle(tests);
     }
 
-    // Generates bitmasks like (1, 1, ..., 1, 0, ..., 0)
+    // Generates bitmasks like (1, ..., 1, 0, ..., 0)
     private void generateTwoPowersBitmasks() {
         double[] bitmask = new double[inputSize];
         int size = inputSize + 1;

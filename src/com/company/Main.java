@@ -5,7 +5,6 @@ import com.company.model.network.NeuralNetwork;
 import com.company.train.TestFunctionsEnum;
 import com.company.train.TestSet;
 import com.company.train.trainer.OfflineTrainer;
-import com.company.train.trainer.OnlineTrainer;
 import com.company.train.trainer.Trainer;
 import com.company.train.trainer.TrainerOptions;
 
@@ -15,16 +14,16 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TestFunctionsEnum testFunction = TestFunctionsEnum.ONE_QUANTITY;
-        NeuralNetwork neuralNetwork = new NeuralNetwork(784, 10, new int[] {32, 16});
-        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 10000, 128, 0.02, 3);
+        NeuralNetwork neuralNetwork = new NeuralNetwork(784, 10, new int[] {32, 16}, "e");
+        TrainerOptions trainerOptions = new TrainerOptions(0.4, 0.2, 10000, 128, 1, 3);
 
         TestSet testSet = new TestSet(neuralNetwork.inputSize, testFunction.answerFunction);
         Trainer offlineTrainer = new OfflineTrainer(neuralNetwork, testSet, trainerOptions);
 
-        neuralNetwork = offlineTrainer.trainNetwork();
-
-        double[] neuralNetworkErrors = offlineTrainer.getLastTrainErrorsData();
-        System.out.println(Arrays.toString(neuralNetworkErrors));
+//        neuralNetwork = offlineTrainer.trainNetwork();
+//
+//        double[] neuralNetworkErrors = offlineTrainer.getLastTrainErrorsData();
+//        System.out.println(Arrays.toString(neuralNetworkErrors));
 
         for (int i = 0; i < neuralNetwork.weights.length; ++i) {
             System.out.println(neuralNetwork.weights[i]);
@@ -49,7 +48,32 @@ public class Main {
             } catch (Exception e) {
                 System.out.println();
                 System.out.println("--------------------------------------");
-                break;
+                System.out.println("Enter -947 if you wont stop");
+
+                boolean isCommandEntered = true;
+                boolean isTerminated = false;
+
+                while (isCommandEntered) {
+                    try {
+                        in.next();
+                        if (in.nextInt() == -947) {
+                            isCommandEntered = false;
+                            isTerminated = true;
+                        } else {
+                            isCommandEntered = false;
+                        }
+                    } catch (Exception ignored) {
+                        break;
+                    }
+                }
+
+                if (isTerminated) {
+                    break;
+                }
+
+                System.out.println("--------------------------------------");
+
+                continue;
             }
 
             System.out.println();

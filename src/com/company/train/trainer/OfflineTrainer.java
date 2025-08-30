@@ -62,7 +62,7 @@ public class OfflineTrainer extends Trainer {
         }
 
         // initialize processes
-        final int PROCESSES_COUNT = 8;
+        final int PROCESSES_COUNT = 16;
 
         ExecutorService executor = Executors.newFixedThreadPool(PROCESSES_COUNT);
         ArrayList<Future<Matrix[]>> futures = new ArrayList<>();
@@ -110,12 +110,12 @@ public class OfflineTrainer extends Trainer {
 
         // Calculate new increments of weights
         for (int p = 0; p < network.weights.length; ++p) {
-            previousWeightsIncrements[p] = network.weights[p].subtract(oldWeights[p]);
+            previousWeightsIncrements[p] = network.weights[p].minus(oldWeights[p]);
         }
 
         // Calculate new increments of biases
         for (int p = 0; p < network.biases.length; ++p) {
-            previousBiasesIncrements[p] = network.biases[p].subtract(oldBiases[p]);
+            previousBiasesIncrements[p] = network.biases[p].minus(oldBiases[p]);
         }
     }
 

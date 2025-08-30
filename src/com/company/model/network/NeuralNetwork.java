@@ -3,6 +3,11 @@ package com.company.model.network;
 import com.company.model.Matrix;
 import com.company.model.RandomMatrix;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.stream.Stream;
+
 // Neural network model
 public class NeuralNetwork {
     // Options
@@ -28,6 +33,73 @@ public class NeuralNetwork {
         this.hiddenLayersSizes = hiddenLayersSizes.clone();
 
         fillParametersWithRandomValues();
+    }
+
+    // Creates network by parameters which given in console
+    public NeuralNetwork(int inputSize, int outputSize, int[] hiddenLayersSizes, String separator) {
+        hiddenLayersCount = hiddenLayersSizes.length;
+
+        if (hiddenLayersCount == 0) {
+            throw new IllegalArgumentException("There is no way to create network without hidden layers.");
+        }
+
+        this.inputSize = inputSize;
+        this.outputSize = outputSize;
+        this.hiddenLayersSizes = hiddenLayersSizes.clone();
+
+        fillParametersWithRandomValues();
+
+        Scanner in = new Scanner(System.in);
+
+        for (int i = 0; i < hiddenLayersCount + 1; ++i) {
+            ArrayList<double[]> matrix = new ArrayList<>();
+
+            while (true) {
+                String[] line = in.nextLine().split(", ");
+
+                if (line[0].equals(separator)) {
+                    break;
+                }
+
+                double[] values = new double[line.length];
+
+                for (int j = 0; j < line.length; ++j) {
+                    values[j] = Double.parseDouble(line[j]);
+                }
+
+                matrix.add(values);
+            }
+
+            for (int j = 0; j < weights[i].N; ++j) {
+                for (int k = 0; k < weights[i].M; ++k) {
+                    weights[i].values[j][k] = matrix.get(j)[k];
+                }
+            }
+
+            matrix = new ArrayList<>();
+
+            while (true) {
+                String[] line = in.nextLine().split(", ");
+
+                if (line[0].equals(separator)) {
+                    break;
+                }
+
+                double[] values = new double[line.length];
+
+                for (int j = 0; j < line.length; ++j) {
+                    values[j] = Double.parseDouble(line[j]);
+                }
+
+                matrix.add(values);
+            }
+
+            for (int j = 0; j < biases[i].N; ++j) {
+                for (int k = 0; k < biases[i].M; ++k) {
+                    biases[i].values[j][k] = matrix.get(j)[k];
+                }
+            }
+        }
     }
 
     // Creates network by another network's options and parameters
